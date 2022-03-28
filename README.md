@@ -17,7 +17,7 @@
  - **deject func.** to change config
 
 #### cheat image;
-![Screenshot 2022-03-28 190805](https://user-images.githubusercontent.com/81589649/160450598-161d38d0-ad00-4844-893f-ab5ba0f8e6ea.png)
+![Screenshot 2022-03-28 190941](https://user-images.githubusercontent.com/81589649/160450889-af817007-d02b-4e5c-9d63-520e3dc10185.png)
 
 ### 💀 USE AT YOUR OWN RISK 💀
 - I am **not** responsible for anything that happens!
