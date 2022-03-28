@@ -1,3 +1,8 @@
+
+# cs-light a low performance csgo cheat
+
+
+
 #imports
 from colorama import init, Fore, Back
 init(autoreset=True)
@@ -141,6 +146,7 @@ you agree (YES/NO)""")
 [-NOFLASH-]      =       {noflash_on_off}
 [-BUNNYHOP-]     =       {bunnyhop_on_off}
 [-MONEY-REVEAL-] =       {money_reveal_on_off}
+(loop delay)     =       {raw_delay}sec.
 """)
     print (" ")
     print (f"{BLUE}press [P] to deject.")
@@ -154,6 +160,7 @@ you agree (YES/NO)""")
 
     #check if csgo was started and get the dlls
     print (f"{light_GREEN}-[INFO] checking if csgo was started and getting values.")
+
     try:
         pm=pymem.Pymem(PROCESS_NAME)
         log_file.write(f"[info {datetime.now()}] getting dlls and offsets\n")
