@@ -1,0 +1,11 @@
+                      CS-LIGHT-v1.0
+       dev;cookie0_o github: https://github.com/cookie0o
+##############################LOGS##############################
+
+[info- 2022-03-28 18:38:32.780550] hack started
+[info- 2022-03-28 18:38:32.780550] loaded log file
+[info- 2022-03-28 18:38:32.782557] loaded config file
+[info- 2022-03-28 18:38:36.769077] legal disclaimer accepted
+[info- 2022-03-28 18:38:36.814010] showed activated cheats and title.
+[info- 2022-03-28 18:38:36.820010] memory cleared.
+[info- 2022-03-28 18:38:36.828669] cs:go not found: EXITING APP.
