@@ -332,8 +332,3 @@ if __name__ == "__main__":
     print (f"{light_GREEN}-[INFO] Hack started...")
     main()
 
-
-
-#python C:\Users\juerg\Desktop\csgo-light_multihack\main.py
-
-#add a logs system later oks :)
