@@ -73,8 +73,14 @@ def main():
     #change cmd title
     ctypes.windll.kernel32.SetConsoleTitleW(f"ACCEPT LEGAL DISCLAIMER - CS-LIGHT ✳ {VERSION} ✳ {DEV}")
 
+
     # +[LEGAL DISCLAIMER]
-    print (f"""{light_RED}\
+
+    #check if to skip asking
+    show_disclaimer_on_off = config["-SHOW-DISCLAIMER-"]["show_disclaimer"]
+
+    if show_disclaimer_on_off == "ON":
+        print (f"""{light_RED}\
 ----------LEGAL DISCLAIMER----------
 :I`m not responsable for::
 Using this software for illegal purposes.
@@ -83,14 +89,16 @@ And all other things that may happen.
 !!THIS SOFTWARE IS WITHOUT WARRANTY!!
 
 you agree (YES/NO)""")
-    agree_disclaimer = input ("")
-    
-    if agree_disclaimer == "YES":
-        log_file.write(f"[info- {datetime.now()}] legal disclaimer accepted\n")
+        agree_disclaimer = input ("")
+        
+        if agree_disclaimer == "YES":
+            log_file.write(f"[info- {datetime.now()}] legal disclaimer accepted\n")
+            pass
+        elif agree_disclaimer == "NO":
+            log_file.write(f"[info- {datetime.now()}] legal disclaimer declined: EXITING APP\n")
+            exit() 
+    else:
         pass
-    elif agree_disclaimer == "NO":
-        log_file.write(f"[info- {datetime.now()}] legal disclaimer declined: EXITING APP\n")
-        exit() 
 
 
     # +[MAIN PART]
@@ -161,6 +169,28 @@ you agree (YES/NO)""")
     #check if csgo was started and get the dlls
     print (f"{light_GREEN}-[INFO] checking if csgo was started and getting values.")
 
+    #check if csgo was started
+    def check_if_csgo_is_open():
+        time.sleep(1)
+
+        #check if csgo is open
+        try:
+            pm=pymem.Pymem(PROCESS_NAME)
+
+        # csgo not ruing waiting for start
+        except:
+            print (f"{RED}-[ERROR] Pls start {PROCESS_NAME}.", end='\r')
+            check_if_csgo_is_open()
+
+        # csgo was started pass
+        finally:
+            time.sleep(15)
+            print (f"{light_GREEN}-[INFO] csgo was found.     ", end='\r')
+            log_file.write(f"[info- {datetime.now()}] csgo was found.\n")
+            pass
+
+    check_if_csgo_is_open()
+
     try:
         pm=pymem.Pymem(PROCESS_NAME)
         log_file.write(f"[info {datetime.now()}] getting dlls and offsets\n")
@@ -176,13 +206,8 @@ you agree (YES/NO)""")
         log_file.write(f"[info- {datetime.now()}] cs:go not found: EXITING APP.\n")
         
 
-
-    pm=pymem.Pymem(PROCESS_NAME)
- 
     # +[RUN CHEATS]
     print (f"{light_GREEN}-[INFO] starting cheat loop.")
-
-    count = 0
 
     ## CHEATS ##
 
@@ -203,127 +228,130 @@ you agree (YES/NO)""")
 
     cheat_loop = 1
     log_file.write(f"[info- {datetime.now()}] cheat loop started\n")
+    count_raw = 0
     while cheat_loop == 1:
 
-        #clear memory to avoide vac detections or help i guess
-        gc.collect()
-        log_file.write(f"[info- {datetime.now()}] memory cleared.\n")
-        
 
-        #delay so cheat uses less cpu
-        time.sleep(delay)
+        try:
 
-        #deject
-        if keyboard.is_pressed("P"):
-            if money_reveal_on_off == "ON":
-                client_money_reveal = pymem.process.module_from_name(pm.process_handle, 'client.dll')
-                clientModule = pm.read_bytes(client_money_reveal.lpBaseOfDll, client_money_reveal.SizeOfImage)
-                address = client_money_reveal.lpBaseOfDll + re.search(rb'.\x0C\x5B\x5F\xB8\xFB\xFF\xFF\xFF', clientModule).start()
-                pm.write_uchar(address, 0xEB if pm.read_uchar(address) == 0x75 else 0x75)
-                cheat_loop = 0
-                print (f"{light_GREEN}-[INFO] Cheat dejected.")
-                log_file.write(f"[info- {datetime.now()}] cheat dejected\n")
-                print(" ")
-                print (f"{BLUE} do you want to restart the cheat or exit? type RESTART or EXIT")
-                restart_or_exit = input("")
-                if restart_or_exit == "RESTART":
-                    log_file.write(f"[info- {datetime.now()}] exiting cheat\n")
-                    main()
-                else:
-                    log_file.write(f"[info- {datetime.now()}] exiting cheat\n")
-                    exit()
-            else:
-                cheat_loop = 0
-                print (f"{light_GREEN}-[INFO] Cheat dejected.")
-                log_file.write(f"[info- {datetime.now()}] cheat dejected\n")
-                print(" ")
-                print (f"{BLUE} do you want to restart the cheat or exit? type RESTART or EXIT")
-                restart_or_exit = input("")
-                if restart_or_exit == "RESTART":
-                    log_file.write(f"[info- {datetime.now()}] restarting cheat\n")
-                    log_file.write(f" ")
-                    main()
-                else:
-                    log_file.write(f"[info- {datetime.now()}] exiting cheat\n")
-                    log_file.write(f" ")
-                    exit()
-
-
-        else:
-            pass
-                
-        #no flash
-        if noflash_on_off == "ON":
-            if player:
-                flash_value=player+m_flFlashMaxAlpha
-                if flash_value:
-                    pm.write_float(flash_value,float(0))
-        else:
-            pass
-
-        #radar
-        if radar_on_off == "ON":
-            for i in range(1,32):
-                entity=pm.read_int(client+dwEntityList+i*16)
-                if entity:
-                    pm.write_uchar(entity+m_bSpotted,1)
-        else:
-            pass
+            #clear memory to avoide vac detections or help i guess
+            gc.collect()
+            log_file.write(f"[info- {datetime.now()}] memory cleared.\n")
             
-        #bunnyhop
-        if bunnyhop_on_off == "ON":
-            if pm.read_int(client+dwLocalPlayer):
-                force_jump=client+dwForceJump
-                on_ground=pm.read_int(player+m_fFlags)
-                velocity=pm.read_float(player+m_vecVelocity)
-                if keyboard.is_pressed('space')and on_ground==257:
-                    if velocity<1 and velocity>-1:
-                        pass
+
+            #delay so cheat uses less cpu
+            time.sleep(delay)
+
+            #deject
+            if keyboard.is_pressed("P"):
+                if money_reveal_on_off == "ON":
+                    client_money_reveal = pymem.process.module_from_name(pm.process_handle, 'client.dll')
+                    clientModule = pm.read_bytes(client_money_reveal.lpBaseOfDll, client_money_reveal.SizeOfImage)
+                    address = client_money_reveal.lpBaseOfDll + re.search(rb'.\x0C\x5B\x5F\xB8\xFB\xFF\xFF\xFF', clientModule).start()
+                    pm.write_uchar(address, 0xEB if pm.read_uchar(address) == 0x75 else 0x75)
+                    cheat_loop = 0
+                    print (f"{light_GREEN}-[INFO] Cheat dejected.")
+                    log_file.write(f"[info- {datetime.now()}] cheat dejected\n")
+                    print(" ")
+                    print (f"{BLUE} do you want to restart the cheat or exit? type RESTART or EXIT")
+                    restart_or_exit = input("")
+                    if restart_or_exit == "RESTART":
+                        log_file.write(f"[info- {datetime.now()}] exiting cheat\n")
+                        main()
                     else:
-                        pm.write_int(force_jump,5)
-                        time.sleep(0.17)
-                        pm.write_int(force_jump,4)
-        else:
-            pass
+                        log_file.write(f"[info- {datetime.now()}] exiting cheat\n")
+                        exit()
+                else:
+                    cheat_loop = 0
+                    print (f"{light_GREEN}-[INFO] Cheat dejected.")
+                    log_file.write(f"[info- {datetime.now()}] cheat dejected\n")
+                    print(" ")
+                    print (f"{BLUE} do you want to restart the cheat or exit? type RESTART or EXIT")
+                    restart_or_exit = input("")
+                    if restart_or_exit == "RESTART":
+                        log_file.write(f"[info- {datetime.now()}] restarting cheat\n")
+                        log_file.write(f" ")
+                        main()
+                    else:
+                        log_file.write(f"[info- {datetime.now()}] exiting cheat\n")
+                        log_file.write(f" ")
+                        exit()
 
-        #esp
-        if esp_on_off == "ON":
-            glow_manager = pm.read_int(client + dwGlowObjectManager)
 
-            for i in range(1, 32):  # Entities 1-32 are reserved for players.
-                    entity = pm.read_int(client + dwEntityList + i * 0x10)
+            else:
+                pass
+                    
+            #no flash
+            if noflash_on_off == "ON":
+                if player:
+                    flash_value=player+m_flFlashMaxAlpha
+                    if flash_value:
+                        pm.write_float(flash_value,float(0))
+            else:
+                pass
 
+            #radar
+            if radar_on_off == "ON":
+                for i in range(1,32):
+                    entity=pm.read_int(client+dwEntityList+i*16)
                     if entity:
-                            entity_team_id = pm.read_int(entity + m_iTeamNum)
-                            entity_glow = pm.read_int(entity + m_iGlowIndex)
+                        pm.write_uchar(entity+m_bSpotted,1)
+            else:
+                pass
+                
+            #bunnyhop
+            if bunnyhop_on_off == "ON":
+                if pm.read_int(client+dwLocalPlayer):
+                    force_jump=client+dwForceJump
+                    on_ground=pm.read_int(player+m_fFlags)
+                    velocity=pm.read_float(player+m_vecVelocity)
+                    if keyboard.is_pressed('space')and on_ground==257:
+                        if velocity<1 and velocity>-1:
+                            pass
+                        else:
+                            pm.write_int(force_jump,5)
+                            time.sleep(0.17)
+                            pm.write_int(force_jump,4)
+            else:
+                pass
 
-                            if entity_team_id == 2:  # Terrorist
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0x8, float(T_R))   # R
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0xC, float(T_G))   # G
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0x10, float(T_B))  # B
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0x14, float(1))    # Alpha
-                                    pm.write_int(glow_manager + entity_glow * 0x38 + 0x28, 1)       # Enable glow
+            #esp
+            if esp_on_off == "ON":
+                glow_manager = pm.read_int(client + dwGlowObjectManager)
 
-                            elif entity_team_id == 3:  # Counter-terrorist
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0x8, float(CT_R))   # R
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0xC, float(CT_G))   # G
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0x10, float(CT_B))  # B
-                                    pm.write_float(glow_manager + entity_glow * 0x38 + 0x14, float(1))     # Alpha
-                                    pm.write_int(glow_manager + entity_glow * 0x38 + 0x28, 1)         # Enable glow
-        else:
-            pass
+                for i in range(1, 32):  # Entities 1-32 are reserved for players.
+                        entity = pm.read_int(client + dwEntityList + i * 0x10)
 
+                        if entity:
+                                entity_team_id = pm.read_int(entity + m_iTeamNum)
+                                entity_glow = pm.read_int(entity + m_iGlowIndex)
 
-        # change title after 6 loops to avoid using to much cpu.
-        count + 1
-        if count == 6:
-            #change cmd title to a random string
-            RANDOM_STR = secrets.token_hex(32)
-            ctypes.windll.kernel32.SetConsoleTitleW(RANDOM_STR)
-            # reset count
-            count = 0
-        else:
-            pass
+                                if entity_team_id == 2:  # Terrorist
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0x8, float(T_R))   # R
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0xC, float(T_G))   # G
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0x10, float(T_B))  # B
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0x14, float(1))    # Alpha
+                                        pm.write_int(glow_manager + entity_glow * 0x38 + 0x28, 1)       # Enable glow
+
+                                elif entity_team_id == 3:  # Counter-terrorist
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0x8, float(CT_R))   # R
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0xC, float(CT_G))   # G
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0x10, float(CT_B))  # B
+                                        pm.write_float(glow_manager + entity_glow * 0x38 + 0x14, float(1))     # Alpha
+                                        pm.write_int(glow_manager + entity_glow * 0x38 + 0x28, 1)         # Enable glow
+            else:
+                pass
+
+        #if csgo was closed or cheat crashedprint error in cmd and log
+        except:
+            #print error in cmd
+            print (f"{light_RED}-[ERROR] Cheat crashed and will now restart in 5 seconds.")
+            #log error
+            log_file.write(f"[error- {datetime.now()}] cheat crashed restarting in 5sec.\n")
+            time.sleep(5)
+            #restart
+            main()
+            
         
 
 #start main function
