@@ -1,6 +1,6 @@
 <div align=center>
   
-  # 💎cs-light without UI [v1.0]💎
+  # 💎cs-light without UI [v1.1]💎
   
   **⚠️-a low performance cheat based on a cmd prompt made in python currently (probably) vac undetected!-⚠️** 
   
