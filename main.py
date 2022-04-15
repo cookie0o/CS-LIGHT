@@ -21,14 +21,14 @@ import gc
 from offsets.OFFSETS import *
 
 #clear cmd and checking if computer is linux or windows 
-#basically this cheat is for windows but idk who uses linux so maby this cheat works for it too but idk
+#basically this cheat is for windows but idk who uses linux so maby this cheat works for it too but idk again
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 #define version an dev
 PROCESS_NAME = "csgo.exe"
-VERSION      = "v1.0"
+VERSION      = "v1.1"
 DEV          = "cookie0_o github: https://github.com/cookie0o"
 
 #get current path
@@ -75,9 +75,18 @@ def main():
 
 
     # +[LEGAL DISCLAIMER]
+    
+    #check if legal discplaimer was already accepted
 
-    #check if to skip asking
-    show_disclaimer_on_off = config["-SHOW-DISCLAIMER-"]["show_disclaimer"]
+    #check for file in logs with name legal_disclaimer_accepted.txt
+    if os.path.isfile(os.path.join(dirname, 'logs/legal_disclaimer_accepted.txt')):
+        print (f"{light_GREEN}-[info] legal disclaimer was already accepted")
+        show_disclaimer_on_off = "OFF"
+    else:
+        show_disclaimer_on_off = "ON"
+        
+    
+
 
     if show_disclaimer_on_off == "ON":
         print (f"""{light_RED}\
@@ -93,7 +102,13 @@ you agree (YES/NO)""")
         
         if agree_disclaimer == "YES":
             log_file.write(f"[info- {datetime.now()}] legal disclaimer accepted\n")
+
+            # generate file in logs folder and name it legal disclaimer accepted
+            with open(os.path.join(dirname, 'logs/legal_disclaimer_accepted.txt'), 'w') as f:
+                f.write("legal disclaimer accepted skiping disclaimer on next start")
+            f.close()    
             pass
+
         elif agree_disclaimer == "NO":
             log_file.write(f"[info- {datetime.now()}] legal disclaimer declined: EXITING APP\n")
             exit() 
